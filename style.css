@@ -45,3 +45,8 @@ body.site-shell:before,body.site-shell:after{display:none}
 .articles-renamed .article-list,.articles-renamed .article-next{background:transparent}
 .services-renamed .section,.services-renamed .cards article,.services-renamed .faq details{border:0;box-shadow:none}
 .service-deep-dive{max-width:920px}.deep-service{padding:28px 0;border-bottom:1px solid #dce2dc}.deep-service:last-child{border-bottom:0}.deep-service h3{font-size:25px;color:var(--brand);margin:0 0 8px}.deep-service p{max-width:800px}.deep-service li{margin:8px 0;color:var(--muted)}
+
+
+/* Final image treatment: preserve the complete image and remove every content/background frame. */
+.site-background-art img{border:0!important;box-shadow:none!important;padding:0!important;object-fit:contain!important;background:transparent!important}
+.hero-image,.service-image,.split-image,.about-image,.detail-image,.gallery-img,.video-card video{object-fit:contain!important;background:transparent!important;border:0!important}
