@@ -50,3 +50,6 @@ body.site-shell:before,body.site-shell:after{display:none}
 /* Final image treatment: preserve the complete image and remove every content/background frame. */
 .site-background-art img{border:0!important;box-shadow:none!important;padding:0!important;object-fit:contain!important;background:transparent!important}
 .hero-image,.service-image,.split-image,.about-image,.detail-image,.gallery-img,.video-card video{object-fit:contain!important;background:transparent!important;border:0!important}
+
+/* Blue image background for the contact call-to-action section. */
+.contact{background-color:#123b4a;background-image:linear-gradient(135deg,rgba(7,35,57,.84),rgba(18,91,119,.68)),url("assets/gallery-28.jpg");background-size:cover;background-position:center;color:#fff}
