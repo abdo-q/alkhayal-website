@@ -2,11 +2,11 @@
 .design-preview{display:block;width:100%;height:245px;border:0;border-bottom:1px solid var(--line);background:#111;pointer-events:none}.design-card{padding:0!important}.design-card h3,.design-card p,.design-card .button{margin-left:20px;margin-right:20px}.design-card h3{margin-top:17px}.design-card .button{margin-bottom:20px}.button svg{width:16px;height:16px}.icon-link svg{width:16px;height:16px}
 
 
-/* أزرار التواصل العائمة — شركة الخيال */
-.floating-contact{position:fixed;z-index:1000;left:18px;bottom:18px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
-.floating-contact a{display:flex;align-items:center;gap:9px;min-height:48px;padding:11px 16px;border-radius:999px;color:#fff;font:700 14px Tahoma,Arial,sans-serif;box-shadow:0 8px 24px #10182830;transition:transform .2s,box-shadow .2s}
-.floating-contact a:hover{transform:translateY(-2px);box-shadow:0 12px 28px #10182840}
+/* أزرار تواصل عائمة صغيرة وواضحة على جانب الشاشة */
+.floating-contact{position:fixed;z-index:1000;right:16px;bottom:22%;display:flex;flex-direction:column;gap:10px;align-items:center}
+.floating-contact a{display:flex;align-items:center;justify-content:center;width:48px;height:48px;min-height:48px;padding:0;border-radius:50%;color:#fff;box-shadow:0 5px 16px #10182835;transition:transform .2s,box-shadow .2s;line-height:1}
+.floating-contact a:hover{transform:scale(1.07);box-shadow:0 8px 22px #10182845}
 .floating-contact .whatsapp{background:#168b51}
 .floating-contact .phone{background:#172c4b}
-.floating-contact svg{width:21px;height:21px;flex:0 0 auto;fill:currentColor}
-@media(max-width:540px){.floating-contact{left:12px;bottom:12px;gap:8px}.floating-contact a{min-height:46px;padding:10px 13px;font-size:13px}}
+.floating-contact svg{display:block;width:22px;height:22px;flex:0 0 auto;fill:currentColor}
+@media(max-width:540px){.floating-contact{right:10px;bottom:18%;gap:8px}.floating-contact a{width:44px;height:44px;min-height:44px}.floating-contact svg{width:20px;height:20px}}
