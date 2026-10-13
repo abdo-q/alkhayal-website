@@ -39,6 +39,8 @@ class PageParser(HTMLParser):
         self.schemas: list[str] = []
         self.in_schema = False
         self.h1_count = 0
+        self.section_depth = 0
+        self.section_balance_ok = True
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         d = dict(attrs)
@@ -48,6 +50,8 @@ class PageParser(HTMLParser):
             self.in_title = True
         if tag == 'h1':
             self.h1_count += 1
+        if tag == 'section':
+            self.section_depth += 1
         if tag == 'meta':
             if d.get('name') == 'description':
                 self.description = d.get('content', '') or ''
@@ -74,6 +78,10 @@ class PageParser(HTMLParser):
     def handle_endtag(self, tag: str) -> None:
         if tag == 'title':
             self.in_title = False
+        if tag == 'section':
+            self.section_depth -= 1
+            if self.section_depth < 0:
+                self.section_balance_ok = False
         if tag == 'nav' and self.nav_depth:
             self.nav_depth -= 1
         if tag == 'a' and self.current_anchor is not None:
@@ -112,6 +120,8 @@ def validate(root: Path) -> list[str]:
             fail(errors, f'{name}: HTML parsing failed: {exc}')
             continue
         parsed[name] = p
+        if p.section_depth != 0 or not p.section_balance_ok:
+            fail(errors, f'{name}: section elements are not balanced')
         if not p.title.strip():
             fail(errors, f'{name}: title is empty')
         if not p.description.strip():
@@ -208,6 +218,8 @@ def validate(root: Path) -> list[str]:
         home = (root / 'index.html').read_text(encoding='utf-8')
         if 'fetchpriority="high"' not in home or 'loading="eager"' not in home:
             fail(errors, 'index.html: hero image must use high fetch priority and eager loading')
+        if home.count('class="home-step"') != 3:
+            fail(errors, 'index.html: the three-step service-request preview is missing or incomplete')
     return errors
 
 
