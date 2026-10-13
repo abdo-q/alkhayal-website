@@ -21,3 +21,10 @@ body.site-shell.cleaning-art .page-hero{background:linear-gradient(135deg,rgba(1
 body.site-shell.cleaning-art .section{background:rgba(255,255,255,.56);border-radius:28px}
 .contact{background-color:#050505;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:18px 18px}
 @media(max-width:760px){.site-background-art img{opacity:.35}.site-background-art .art-1{right:-50px}.site-background-art .art-5{left:-45px}.site-background-art .art-6{right:-50px}}
+
+
+/* Content images stay clean; framed images are reserved for the floating background artwork. */
+.hero-photo,.split-image,.about-image,.detail-image,.gallery-img,.video-card video{border:0!important}
+.hero-photo{box-shadow:none}
+
+.article-related{margin-top:16px;padding-top:12px;border-top:1px solid #d9ded8;color:var(--muted);font-size:12px}.article-related a{color:var(--brand);font-weight:800}.article-related a:hover{color:var(--accent)}.long-article{padding:44px 0}.long-article p{max-width:760px}.article-next{margin:26px 0 54px;padding:30px;border-radius:22px;background:rgba(255,255,255,.68);box-shadow:0 12px 25px #123b4a0d}.article-next h2{font-size:28px}.article-next p{max-width:700px}
