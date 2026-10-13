@@ -1,1 +1,15 @@
-The requested file reference is not currently visible. Use files.search or files.list to rediscover the file, then retry with a returned ref_id or file_id.
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Searching — واجهة قابلة للتعديل</title>
+<style>
+:root{--background:#000;--text:#696969;--dot-color:rgba(255,255,255,.12);--glow:rgba(255,105,85,.09);--label-size:24px;--dot-spacing:24px}
+*{box-sizing:border-box}html,body{width:100%;min-height:100%;margin:0}
+body{min-height:100vh;overflow:hidden;background:radial-gradient(ellipse at 50% 105%,var(--glow),transparent 43%),var(--background);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+.dot-grid{position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(var(--dot-color) 1px,transparent 1px);background-size:var(--dot-spacing) var(--dot-spacing);background-position:6px 6px}
+.status{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:14px;direction:ltr;white-space:nowrap}
+.orb{width:31px;height:31px;flex:0 0 31px;border-radius:50%;background:conic-gradient(from 220deg,#ff716d,#ffb45e 24%,#e75ca9 47%,#8b75ff 70%,#43b8ff 84%,#ff716d);border:1px solid rgba(255,255,255,.22);box-shadow:0 0 16px rgba(255,110,120,.25)}
+.status-text{margin:0;color:var(--text);font-size:var(--label-size);font-weight:600;letter-spacing:.1px}
+@media(max-width:480px){.status{gap:11px}.orb{width:27px;height:27px;flex-basis:27px}.status-text{font-size:21px}}
+</style></head><body><div class="dot-grid" aria-hidden="true"></div><main class="status" role="status" aria-live="polite"><span class="orb" aria-hidden="true"></span><h1 class="status-text">Searching</h1></main></body></html>
