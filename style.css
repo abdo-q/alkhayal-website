@@ -53,3 +53,11 @@ body.site-shell:before,body.site-shell:after{display:none}
 
 /* Blue image background for the contact call-to-action section. */
 .contact{background-color:#123b4a;background-image:linear-gradient(135deg,rgba(7,35,57,.84),rgba(18,91,119,.68)),url("assets/gallery-28.jpg");background-size:cover;background-position:center;color:#fff}
+
+/* Clean flat mode: remove decorative backgrounds, frames and shadows site-wide. */
+body.site-shell{background:#fff!important;background-image:none!important}
+body.site-shell:before,body.site-shell:after,.site-background-art{display:none!important}
+header,main,footer,.hero,.split-band,.section,.page-hero,.contact,.video-card,.cards article,.mini-grid article,.gallery-grid figure,.value-grid>div,.contact-card,.faq details,.faq-long details,.guide-grid>div,.process-grid>div,.article-next,.service-deep-dive,.deep-service{background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important}
+.hero:before{display:none!important}
+.long-article,.article-related,.footer-bottom{border:0!important}
+.hero-photo,.split-image,.about-image,.detail-image,.gallery-img,.service-image,.video-card video{border:0!important;box-shadow:none!important}
