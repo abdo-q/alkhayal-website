@@ -1,76 +1,36 @@
+#!/usr/bin/env python3
+"""Publish the curated static HTML source tree into ./dist.
+
+The HTML pages are the source of truth. This script intentionally does not
+regenerate page content; it copies only the production allowlist and assets.
+"""
 from pathlib import Path
-from html import escape
+import shutil
 
-ROOT = Path(__file__).parent
-ASSETS = ROOT / 'assets'
-images = sorted(p.name for p in ASSETS.glob('gallery-*.*') if p.suffix.lower() in {'.png','.jpg','.jpeg','.webp'})
-base = 'https://abdo-q.github.io/alkhayal-website/'
-phone = '+966552610151'
+ROOT = Path(__file__).resolve().parent
+DIST = ROOT / 'dist'
+PAGES = (
+    'index.html', 'services.html', 'articles.html', 'about.html', 'contact.html',
+    'moving.html', 'maintenance.html', 'air-conditioning.html', 'cleaning.html',
+    'gas-ovens.html', 'faq.html', 'process.html', 'privacy.html',
+)
+ROOT_FILES = ('style.css', 'logo.svg', 'site.webmanifest', 'robots.txt', 'sitemap.xml', 'manus-routes.json')
 
-logo = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-labelledby="title"><title id="title">شعار شركة الخيال للخدمات المنزلية</title><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f6c66d"/><stop offset="1" stop-color="#d4872b"/></linearGradient></defs><rect x="7" y="7" width="166" height="166" rx="45" fill="#fffaf2" stroke="url(#g)" stroke-width="5"/><path d="M32 88 90 38l58 50v54a8 8 0 0 1-8 8H40a8 8 0 0 1-8-8Z" fill="#123b4a"/><path d="M69 150v-39a6 6 0 0 1 6-6h30a6 6 0 0 1 6 6v39" fill="#fffaf2"/><path d="M49 87h82M50 70h80" stroke="#f6c66d" stroke-width="5" stroke-linecap="round"/><path d="m127 27 5 11 12 5-12 5-5 12-5-12-12-5 12-5Z" fill="url(#g)"/><text x="90" y="164" text-anchor="middle" font-family="Tahoma,Arial" font-weight="700" font-size="16" fill="#123b4a">الخيال</text></svg>'''
-(ROOT/'logo.svg').write_text(logo, encoding='utf-8')
 
-def meta(title, desc, path, keywords='خدمات منزلية, نقل أثاث, صيانة منزلية, تنظيف منازل, صيانة تكييف, شركة الخيال'):
-    url = base + path
-    return f'''<title>{escape(title)}</title><meta name="description" content="{escape(desc)}"><meta name="keywords" content="{escape(keywords)}"><meta name="robots" content="index,follow"><link rel="canonical" href="{url}"><meta property="og:type" content="website"><meta property="og:locale" content="ar_SA"><meta property="og:site_name" content="شركة الخيال للخدمات المنزلية"><meta property="og:title" content="{escape(title)}"><meta property="og:description" content="{escape(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{base}assets/gallery-01.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{escape(title)}"><meta name="twitter:description" content="{escape(desc)}"><meta name="twitter:image" content="{base}assets/gallery-01.png">'''
+def main() -> None:
+    for name in (*PAGES, *ROOT_FILES):
+        if not (ROOT / name).is_file():
+            raise SystemExit(f'Missing required publish file: {name}')
+    if DIST.exists():
+        if DIST.parent != ROOT or DIST.name != 'dist':
+            raise SystemExit(f'Refusing to remove unexpected output path: {DIST}')
+        shutil.rmtree(DIST)
+    DIST.mkdir()
+    for name in (*PAGES, *ROOT_FILES):
+        shutil.copy2(ROOT / name, DIST / name)
+    shutil.copytree(ROOT / 'assets', DIST / 'assets')
+    print(f'Built {len(PAGES)} pages and assets into {DIST}')
 
-def header(active=''):
-    links=[('index.html','الرئيسية'),('services.html','خدماتنا'),('about.html','من نحن'),('articles.html','المقالات'),('gallery.html','المعرض'),('contact.html','تواصل معنا')]
-    nav=''.join(f'<a class="{("active" if href==active else "")}" href="{href}">{label}</a>' for href,label in links)
-    return f'''<header><a class="logo" href="index.html"><img class="brand-logo" src="logo.svg" alt="شعار شركة الخيال للخدمات المنزلية"><span>شركة الخيال<small>HOME SERVICES</small></span></a><nav aria-label="التنقل الرئيسي">{nav}</nav></header>'''
 
-def floating():
-    return f'''<div class="floating-contact" aria-label="طرق التواصل السريع"><a class="whatsapp" href="https://wa.me/{phone}" target="_blank" rel="noopener noreferrer" aria-label="تواصل عبر واتساب"><b>◉</b><span>واتساب</span></a><a class="phone" href="tel:{phone}" aria-label="اتصل الآن"><b>☎</b><span>اتصل بنا</span></a></div>'''
-
-def footer():
-    return '''<footer><div class="footer-grid"><div><strong>شركة الخيال</strong><p>خدمات منزلية موثوقة تبدأ من تواصل واضح وتنتهي بتفاصيل مرتبة.</p></div><div><strong>روابط مهمة</strong><a href="services.html">الخدمات</a><a href="articles.html">النصائح والمقالات</a><a href="gallery.html">معرض الصور</a></div><div><strong>تواصل سريع</strong><a href="contact.html">اطلب عرضًا أو استفسر</a><a href="tel:+966552610151">0552610151</a><a href="privacy.html">سياسة الخصوصية</a></div></div><div class="footer-bottom">© 2026 شركة الخيال — جميع الحقوق محفوظة · <a href="sitemap.xml">خريطة الموقع</a></div></footer>'''
-
-def page(title, desc, path, active, body, schema=''):
-    return f'''<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">{meta(title,desc,path)}<link rel="stylesheet" href="style.css">{schema}</head><body>{header(active)}<main>{body}</main>{footer()}{floating()}</body></html>'''
-
-def img(n, alt, cls='gallery-img'):
-    return f'<img class="{cls}" src="assets/{n}" alt="{escape(alt)}" loading="lazy">'
-
-schema='''<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"شركة الخيال للخدمات المنزلية","url":"https://abdo-q.github.io/alkhayal-website/","telephone":"+966552610151","description":"خدمات نقل الأثاث والصيانة المنزلية والتكييف والنظافة.","areaServed":"المملكة العربية السعودية","serviceType":["نقل الأثاث","الصيانة المنزلية","صيانة التكييف","خدمات النظافة"]}</script>'''
-
-hero = f'''<section class="hero"><div class="hero-copy"><p class="eyebrow">خدمات منزلية تحت سقف واحد</p><h1>نرتّب تفاصيل منزلك<br><em>بخبرة واهتمام</em></h1><p class="lead">من نقل الأثاث إلى الصيانة والتكييف والنظافة، تساعدك شركة الخيال على الوصول إلى الخدمة المناسبة بخطوات واضحة وتواصل مباشر.</p><div class="hero-actions"><a class="button" href="contact.html">اطلب خدمتك الآن</a><a class="button light" href="services.html">تعرّف على الخدمات</a></div><div class="trust-row"><span>✓ تواصل مباشر</span><span>✓ خطوات واضحة</span><span>✓ عناية بالمكان</span></div></div><div class="hero-photo">{img(images[0] if images else 'gallery-01.png','خدمات منزلية وتجهيز منزل مرتب','hero-image')}<div class="photo-caption"><strong>الخيال للخدمات المنزلية</strong><span>نقل • صيانة • تكييف • نظافة</span></div></div></section>'''
-services = f'''<section class="section"><p class="eyebrow">خدماتنا الأساسية</p><h2>مساعدة عملية لكل مساحة</h2><p class="section-intro">اختر الخدمة الأقرب لاحتياجك، ثم اطلع على التفاصيل أو تواصل معنا مباشرة لتوضيح الطلب والموعد المناسب.</p><div class="cards service-cards">'''
-svc=[('moving.html','نقل الأثاث والعفش','تجهيز وتغليف وترتيب نقل الأثاث مع الانتباه للمداخل والقطع الحساسة.',images[1] if len(images)>1 else 'gallery-02.png','نقل وتجهيز الأثاث'),('maintenance.html','الصيانة المنزلية','مساعدة في فهم الأعطال المنزلية الشائعة وتحديد الخطوة الآمنة التالية.',images[2] if len(images)>2 else 'gallery-03.png','أعمال صيانة منزلية'),('air-conditioning.html','صيانة التكييف','فحص العناية الدورية بالتكييف ومتى تحتاج إلى فني مختص.',images[3] if len(images)>3 else 'gallery-04.png','صيانة جهاز تكييف'),('cleaning.html','خدمات النظافة','تنظيم تنظيف المنزل والمساحات المختلفة بطريقة مرتبة وآمنة.',images[4] if len(images)>4 else 'gallery-05.png','تنظيف وترتيب المنزل')]
-for href,name,desc,im,alt in svc:
-    services += f'<article class="service-card">{img(im,alt,"service-image")}<div class="card-body"><p class="card-kicker">خدمة منزلية</p><h3>{name}</h3><p>{desc}</p><a class="icon-link" href="{href}">تفاصيل الخدمة <span>←</span></a></div></article>'
-services += '</div></section>'
-
-home_body = hero + services + f'''<section class="split-band"><div><p class="eyebrow">لماذا الخيال؟</p><h2>تنظيم أكثر، توتر أقل</h2><p>نؤمن أن الخدمة المنزلية الجيدة تبدأ من الاستماع وفهم المكان. لذلك نعرض لك المعلومات التي تحتاجها قبل التواصل، ونربط كل خدمة بنصائح عملية تساعدك على الاستعداد.</p><a class="button" href="about.html">اعرف قصتنا</a></div>{img(images[5] if len(images)>5 else 'gallery-06.png','فريق وخدمات منزلية منظمة','split-image')}</section><section class="section video-section"><div class="section-heading"><div><p class="eyebrow">شاهد فكرة سريعة</p><h2>من الصور إلى تجربة واحدة</h2></div><a class="text-link" href="gallery.html">استعرض كل الصور ←</a></div><div class="video-card"><video controls preload="metadata" poster="assets/{images[0] if images else 'gallery-01.png'}"><source src="assets/intro.mp4" type="video/mp4">متصفحك لا يدعم تشغيل الفيديو.</video><div><h3>لمحات من خدمات شركة الخيال</h3><p>فيديو تعريفي قصير من صور الموقع. أرسل لنا رابط الفيديو الرسمي لاحقًا لاستبداله به.</p><a href="contact.html" class="icon-link">تواصل معنا للتفاصيل ←</a></div></div></section><section class="section article-preview"><div class="section-heading"><div><p class="eyebrow">نصائح مفيدة</p><h2>اقرأ قبل طلب الخدمة</h2></div><a class="text-link" href="articles.html">كل المقالات ←</a></div><div class="mini-grid"><article><span>01</span><h3><a href="articles.html#moving">كيف تستعد لنقل الأثاث؟</a></h3><p>قائمة عملية تساعدك على بدء يوم النقل دون فوضى.</p></article><article><span>02</span><h3><a href="articles.html#maintenance">متى تستدعي فني صيانة؟</a></h3><p>علامات لا ينبغي تجاهلها في المنزل.</p></article><article><span>03</span><h3><a href="articles.html#cleaning">خطة تنظيف منزلية أسبوعية</a></h3><p>قسّم المهام واجعل النتيجة أسهل.</p></article></div></section><section class="contact"><p class="eyebrow">جاهز للخطوة التالية؟</p><h2>صف احتياجك وسنساعدك على ترتيبه</h2><p>اتصل أو راسلنا عبر واتساب للاستفسار عن نقل الأثاث والصيانة والتكييف والنظافة.</p><a class="button light" href="contact.html">تواصل مع شركة الخيال</a></section>'''
-(ROOT/'index.html').write_text(page('شركة الخيال | خدمات منزلية ونقل وصيانة ونظافة','شركة الخيال للخدمات المنزلية: نقل الأثاث، الصيانة المنزلية، صيانة التكييف، وخدمات النظافة في مكان واحد.', '', 'index.html', home_body, schema),encoding='utf-8')
-
-service_body=f'''<section class="page-hero"><p class="eyebrow">خدمات شركة الخيال</p><h1>خدمات منزلية تساعدك على إنجاز يومك</h1><p>من التخطيط والنقل إلى العناية بالمنزل، اختر القسم المناسب واقرأ التفاصيل قبل التواصل.</p></section><section class="section">{services.split('<section class="section">',1)[1].split('</section>',1)[0]}</section><section class="section faq"><p class="eyebrow">أسئلة شائعة</p><h2>قبل طلب الخدمة</h2><details open><summary>كيف أبدأ؟</summary><p>أرسل نوع الخدمة والمدينة والموعد التقريبي وأي تفاصيل عن المكان عبر صفحة التواصل.</p></details><details><summary>هل يمكن الاستفسار قبل الحجز؟</summary><p>نعم، صفحة التواصل مخصصة للاستفسارات الأولية وتوضيح احتياجك.</p></details><details><summary>هل توجد نصائح للاستعداد؟</summary><p>نعم، راجع <a href="articles.html">قسم المقالات</a> قبل طلب الخدمة.</p></details></section>'''
-(ROOT/'services.html').write_text(page('خدمات شركة الخيال | نقل وصيانة ونظافة','استكشف خدمات شركة الخيال في نقل الأثاث والصيانة المنزلية والتكييف والنظافة، مع تفاصيل عملية وروابط مباشرة للتواصل.','services.html','services.html',service_body,schema),encoding='utf-8')
-
-articles=[('moving','كيف تستعد لنقل الأثاث؟','قبل يوم النقل، تخلّص من الأشياء غير الضرورية، صوّر التوصيلات، صنّف الصناديق حسب الغرف، واكتب قائمة بالقطع القابلة للكسر. اترك ممرات الحركة واضحة، وتأكد من قياسات الأبواب والمصعد ومكان الوقوف.','moving.html'),('maintenance','متى تستدعي فني صيانة؟','إذا ظهرت رائحة احتراق أو شرر أو تسرب مستمر، أوقف مصدر الخطر واطلب مساعدة مختص. لا تحاول تفكيك الأجهزة أو التوصيلات الكهربائية دون معرفة كافية. وصف المشكلة ووقت ظهورها يساعد في تسريع التشخيص.','maintenance.html'),('cleaning','خطة تنظيف منزلية أسبوعية','قسّم المنزل إلى مناطق صغيرة، وابدأ من الأعلى إلى الأسفل. خصص يومًا للأسطح والمطابخ ويومًا للحمامات ويومًا للغسيل والترتيب. لا تخلط المنظفات، واحفظها بعيدًا عن الأطفال.','cleaning.html'),('ac','كيف تحافظ على كفاءة التكييف؟','نظف الفلاتر وفق تعليمات الشركة، وراقب ضعف التبريد أو الأصوات غير المعتادة أو تسرب الماء. التنظيف الدوري يساعد على تحسين الهواء والأداء، لكن الأعطال تحتاج فنيًا مختصًا.','air-conditioning.html'),('moving-cost','ما الذي يؤثر في تكلفة نقل الأثاث؟','تؤثر كمية الأثاث، والمسافة، والطوابق، وسهولة الوصول، والحاجة إلى التغليف أو الفك والتركيب في تقدير الخدمة. جهّز هذه المعلومات عند التواصل لتحصل على صورة أوضح.','contact.html'),('home-checklist','قائمة فحص منزلية قبل السفر','أغلق مصادر المياه غير الضرورية، افصل الأجهزة الحساسة، تأكد من الأقفال، ونظّف الأطعمة القابلة للتلف. هذه الخطوات البسيطة تقلل المفاجآت عند العودة.','contact.html')]
-article_html='<section class="page-hero"><p class="eyebrow">مركز المعرفة</p><h1>مقالات ونصائح للخدمات المنزلية</h1><p>محتوى عملي يساعدك على الاستعداد للنقل والصيانة والنظافة والتكييف، مع روابط مباشرة للخدمة المناسبة.</p></section><section class="section article-list">'
-for i,(anchor,title,text,link) in enumerate(articles,1): article_html += f'<article id="{anchor}" class="long-article"><span class="article-number">{i:02d}</span><div><h2>{title}</h2><p>{text}</p><a class="icon-link" href="{link}">انتقل إلى الخدمة المرتبطة ←</a></div></article>'
-article_html+='</section><section class="contact"><h2>هل لديك سؤال مختلف؟</h2><p>أرسل تفاصيل احتياجك وسنساعدك على تحديد الخطوة التالية.</p><a class="button light" href="contact.html">تواصل معنا</a></section>'
-(ROOT/'articles.html').write_text(page('مقالات ونصائح الخدمات المنزلية | شركة الخيال','مقالات شركة الخيال عن نقل الأثاث والصيانة المنزلية والتكييف والتنظيف، مع نصائح عملية قبل طلب الخدمة.','articles.html','articles.html',article_html,schema),encoding='utf-8')
-
-gallery_cards=''.join(f'<figure>{img(n,f"صورة من خدمات شركة الخيال رقم {i}")}<figcaption>من معرض شركة الخيال للخدمات المنزلية</figcaption></figure>' for i,n in enumerate(images,1))
-gallery_body=f'<section class="page-hero"><p class="eyebrow">صور من الواقع</p><h1>معرض شركة الخيال</h1><p>مجموعة الصور المرفقة بالموقع، موزعة لتعرّفك على أجواء الخدمات المنزلية والنقل والترتيب.</p></section><section class="section gallery-grid">{gallery_cards}</section><section class="contact"><h2>هل تريد خدمة مشابهة؟</h2><p>اتصل بنا أو راسلنا عبر واتساب لوصف احتياجك.</p><a class="button light" href="contact.html">اطلب خدمة</a></section>'
-(ROOT/'gallery.html').write_text(page('معرض الصور | شركة الخيال للخدمات المنزلية','شاهد صور شركة الخيال للخدمات المنزلية واكتشف أجواء النقل والصيانة والنظافة والترتيب.','gallery.html','gallery.html',gallery_body,schema),encoding='utf-8')
-
-about_body=f'<section class="page-hero"><p class="eyebrow">من نحن</p><h1>شركة الخيال للخدمات المنزلية</h1><p>علامة محلية تركّز على جعل طلب الخدمة المنزلية أوضح وأسهل، من أول سؤال حتى ترتيب الخطوة التالية.</p></section><section class="section about-layout"><div><h2>خدمة تبدأ بالاستماع</h2><p>نربط بين المحتوى المفيد والخدمة العملية حتى يعرف العميل ما الذي يحتاج إلى تجهيزه قبل التواصل. هدفنا تجربة أكثر وضوحًا وعناية بالمكان.</p><ul class="check-list"><li>تواصل مباشر وواضح</li><li>اهتمام بتفاصيل المنزل</li><li>شرح مبسط للخطوات</li><li>روابط ومعلومات تساعدك قبل الطلب</li></ul><a class="button" href="contact.html">تواصل معنا</a></div>{img(images[6] if len(images)>6 else 'gallery-07.png','منزل مرتب يعكس العناية بالتفاصيل','about-image')}</section><section class="section values"><p class="eyebrow">قيمنا</p><h2>ثلاثة مبادئ في كل تواصل</h2><div class="value-grid"><div><b>01</b><h3>وضوح</h3><p>نبدأ بفهم المطلوب والظروف المحيطة به.</p></div><div><b>02</b><h3>عناية</h3><p>نتعامل مع المكان والممتلكات باهتمام.</p></div><div><b>03</b><h3>ترتيب</h3><p>نحوّل التفاصيل الكثيرة إلى خطوات مفهومة.</p></div></div></section>'
-(ROOT/'about.html').write_text(page('من نحن | شركة الخيال للخدمات المنزلية','تعرف على شركة الخيال للخدمات المنزلية وقيمها في الوضوح والعناية وترتيب خدمات النقل والصيانة والنظافة.','about.html','about.html',about_body,schema),encoding='utf-8')
-
-contact_body=f'<section class="page-hero"><p class="eyebrow">تواصل معنا</p><h1>صف احتياجك وسنساعدك على ترتيبه</h1><p>للاستفسار عن نقل الأثاث أو الصيانة المنزلية أو التكييف أو النظافة، استخدم الاتصال أو واتساب.</p></section><section class="section contact-layout"><div class="contact-card"><p class="card-kicker">اتصال مباشر</p><h2>0552610151</h2><p>اذكر نوع الخدمة، المدينة أو المنطقة، الموعد المناسب، وأي تفاصيل عن المكان.</p><a class="button" href="tel:{phone}">اتصل الآن</a><a class="button light" href="https://wa.me/{phone}" target="_blank" rel="noopener noreferrer">راسلنا عبر واتساب</a></div><div class="contact-card soft"><h2>قبل أن تتواصل</h2><ul><li>صوّر المشكلة أو المكان إن أمكن.</li><li>حدد الخدمة الأقرب لاحتياجك.</li><li>اكتب الوقت المتوقع أو الموعد المناسب.</li><li>راجع <a href="articles.html">المقالات والنصائح</a> للاستعداد.</li></ul><a class="icon-link" href="services.html">شاهد كل الخدمات ←</a></div></section><section class="section map-note"><h2>روابط سريعة</h2><p><a href="index.html">الرئيسية</a> · <a href="services.html">الخدمات</a> · <a href="gallery.html">المعرض</a> · <a href="about.html">من نحن</a></p></section>'
-(ROOT/'contact.html').write_text(page('تواصل مع شركة الخيال | اطلب خدمة منزلية','تواصل مع شركة الخيال للاستفسار عن نقل الأثاث والصيانة المنزلية وصيانة التكييف وخدمات النظافة.','contact.html','contact.html',contact_body,schema),encoding='utf-8')
-
-service_details={'moving.html':('نقل الأثاث والعفش','خدمة نقل الأثاث تبدأ بتجهيز القطع وفرزها وتوضيح تفاصيل الموقعين. استخدم قائمة الاستعداد في المقالات قبل التواصل.',images[7] if len(images)>7 else 'gallery-08.png','نقل الأثاث'), 'maintenance.html':('الصيانة المنزلية','دوّن العلامات الظاهرة ووقت بداية المشكلة، وأوقف مصادر الخطر عند وجود شرر أو رائحة احتراق. لا تفك التوصيلات الخطرة بنفسك.',images[8] if len(images)>8 else 'gallery-09.png','أعمال الصيانة'), 'air-conditioning.html':('صيانة التكييف','راقب الفلاتر والتبريد والتسربات والأصوات غير المعتادة، واتبع دليل الشركة المصنعة. عند استمرار المشكلة اطلب فحصًا مختصًا.',images[9] if len(images)>9 else 'gallery-10.png','جهاز تكييف'), 'cleaning.html':('خدمات النظافة','نظّم التنظيف حسب المناطق وابدأ من الأعلى إلى الأسفل، واستخدم الأدوات المناسبة ولا تخلط المنظفات الكيميائية.',images[10] if len(images)>10 else 'gallery-11.png','تنظيف المنزل')}
-for fn,(title,text,im,alt) in service_details.items():
-    body=f'<section class="page-hero"><p class="eyebrow">خدمات شركة الخيال</p><h1>{title}</h1><p>{text}</p></section><section class="section detail-layout">{img(im,alt,"detail-image")}<div><h2>خطوات تساعدك</h2><p>{text} اسألنا عن التفاصيل المناسبة لحالتك، وسنساعدك على ترتيب المعلومات قبل البدء.</p><ul class="check-list"><li>وصف واضح للمطلوب</li><li>تحديد الموعد والمنطقة</li><li>تجهيز المكان قدر الإمكان</li><li>التواصل المباشر عند وجود سؤال</li></ul><a class="button" href="contact.html">تواصل لطلب الخدمة</a><a class="button light" href="articles.html">اقرأ نصيحة مرتبطة</a></div></section><section class="section related"><h2>قد تهمك أيضًا</h2><p><a href="services.html">كل الخدمات</a> · <a href="articles.html">المقالات والنصائح</a> · <a href="gallery.html">معرض الصور</a></p></section>'
-    (ROOT/fn).write_text(page(f'{title} | شركة الخيال',text,fn,'services.html',body,schema),encoding='utf-8')
-
-privacy_body='<section class="page-hero"><p class="eyebrow">معلومات الموقع</p><h1>سياسة الخصوصية</h1><p>نحترم خصوصيتك. هذا الموقع التعريفي لا يحتوي في نسخته الحالية على نموذج يجمع بيانات أو أدوات تتبع مضافة عمدًا.</p></section><section class="section prose"><h2>ما الذي يحدث عند التواصل؟</h2><p>عند اختيار الاتصال أو واتساب، تنتقل إلى تطبيق أو خدمة الاتصال التي تستخدمها أنت. تعامل مع بيانات التواصل وفق سياسات تلك الخدمة.</p><h2>تحديث السياسة</h2><p>قد تتغير هذه السياسة عند إضافة نموذج أو أدوات تحليل. سيتم تحديث هذه الصفحة عند الحاجة.</p><a class="button" href="contact.html">العودة إلى التواصل</a></section>'
-(ROOT/'privacy.html').write_text(page('سياسة الخصوصية | شركة الخيال','سياسة الخصوصية الأولية لموقع شركة الخيال للخدمات المنزلية.','privacy.html','',privacy_body),encoding='utf-8')
-
-# Keep the two design demos reachable from the footer of their own pages, but exclude them from SEO sitemap.
-# Route manifest for platform tooling.
-(ROOT/'manus-routes.json').write_text('{"routes":[{"path":"/","title":"الرئيسية"},{"path":"/services.html","title":"الخدمات"},{"path":"/about.html","title":"من نحن"},{"path":"/articles.html","title":"المقالات"},{"path":"/gallery.html","title":"المعرض"},{"path":"/contact.html","title":"تواصل معنا"},{"path":"/moving.html","title":"نقل الأثاث"},{"path":"/maintenance.html","title":"الصيانة المنزلية"},{"path":"/air-conditioning.html","title":"صيانة التكييف"},{"path":"/cleaning.html","title":"خدمات النظافة"},{"path":"/privacy.html","title":"سياسة الخصوصية"}]}',encoding='utf-8')
-print('generated', len(images), 'images and', len(list(ROOT.glob('*.html'))), 'html pages')
+if __name__ == '__main__':
+    main()

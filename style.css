@@ -23,10 +23,6 @@ body.site-shell.cleaning-art .section{background:rgba(255,255,255,.56);border-ra
 @media(max-width:760px){.site-background-art img{opacity:.35}.site-background-art .art-1{right:-50px}.site-background-art .art-5{left:-45px}.site-background-art .art-6{right:-50px}}
 
 
-/* Content images stay clean; framed images are reserved for the floating background artwork. */
-.hero-photo,.split-image,.about-image,.detail-image,.gallery-img,.video-card video{border:0!important}
-.hero-photo{box-shadow:none}
-
 .article-related{margin-top:16px;padding-top:12px;border-top:1px solid #d9ded8;color:var(--muted);font-size:12px}.article-related a{color:var(--brand);font-weight:800}.article-related a:hover{color:var(--accent)}.long-article{padding:44px 0}.long-article p{max-width:760px}.article-next{margin:26px 0 54px;padding:30px;border-radius:22px;background:rgba(255,255,255,.68);box-shadow:0 12px 25px #123b4a0d}.article-next h2{font-size:28px}.article-next p{max-width:700px}
 
 
@@ -41,29 +37,44 @@ body.site-shell.cleaning-art .section{background:rgba(255,255,255,.56);border-ra
 /* Restore the original neutral dotted canvas; keep the floating background images. */
 body.site-shell{background:#f7f7f5;background-image:radial-gradient(#182c4b0c .8px,transparent .8px);background-size:18px 18px}
 body.site-shell:before,body.site-shell:after{display:none}
-.articles-renamed .section,.articles-renamed .long-article,.articles-renamed .article-related,.articles-renamed .article-next{border:0!important;box-shadow:none}
 .articles-renamed .article-list,.articles-renamed .article-next{background:transparent}
-.services-renamed .section,.services-renamed .cards article,.services-renamed .faq details{border:0;box-shadow:none}
+.services-renamed .section,.services-renamed .faq details{border:0;box-shadow:none}
 .service-deep-dive{max-width:920px}.deep-service{padding:28px 0;border-bottom:1px solid #dce2dc}.deep-service:last-child{border-bottom:0}.deep-service h3{font-size:25px;color:var(--brand);margin:0 0 8px}.deep-service p{max-width:800px}.deep-service li{margin:8px 0;color:var(--muted)}
 
-
-/* Final image treatment: preserve the complete image and remove every content/background frame. */
-.site-background-art img{border:0!important;box-shadow:none!important;padding:0!important;object-fit:contain!important;background:transparent!important}
-.hero-image,.service-image,.split-image,.about-image,.detail-image,.gallery-img,.video-card video{object-fit:contain!important;background:transparent!important;border:0!important}
 
 /* Blue image background for the contact call-to-action section. */
 .contact{background-color:#123b4a;background-image:linear-gradient(135deg,rgba(7,35,57,.84),rgba(18,91,119,.68)),url("assets/gallery-28.jpg");background-size:cover;background-position:center;color:#fff}
 
-/* Clean flat mode: remove decorative backgrounds, frames and shadows site-wide. */
-body.site-shell{background:#fff!important;background-image:none!important}
-body.site-shell:before,body.site-shell:after,.site-background-art{display:none!important}
-header,main,footer,.hero,.split-band,.section,.page-hero,.contact,.video-card,.cards article,.mini-grid article,.gallery-grid figure,.value-grid>div,.contact-card,.faq details,.faq-long details,.guide-grid>div,.process-grid>div,.article-next,.service-deep-dive,.deep-service{background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important}
-.hero:before{display:none!important}
-.long-article,.article-related,.footer-bottom{border:0!important}
-.hero-photo,.split-image,.about-image,.detail-image,.gallery-img,.service-image,.video-card video{border:0!important;box-shadow:none!important}
-
-/* Cache-busted final cleanup: force a plain, borderless presentation. */
-html,body.site-shell,body.site-shell main,body.site-shell header,body.site-shell footer{background:#fff!important;background-image:none!important;border:0!important;box-shadow:none!important}
-body.site-shell .site-background-art,body.site-shell:before,body.site-shell:after,body.site-shell .hero:before{display:none!important;content:none!important}
-body.site-shell .hero,body.site-shell .page-hero,body.site-shell .section,body.site-shell .split-band,body.site-shell .contact,body.site-shell .video-card,body.site-shell article,body.site-shell figure,body.site-shell details,body.site-shell .contact-card,body.site-shell .value-grid>div,body.site-shell .process-grid>div,body.site-shell .guide-grid>div{background:#fff!important;background-image:none!important;border:0!important;box-shadow:none!important}
-body.site-shell img,body.site-shell video{border:0!important;box-shadow:none!important}
+/* Homepage hierarchy and service-card layout; uses the existing palette. */
+.hero{padding-top:clamp(48px,7vw,82px);padding-bottom:clamp(48px,7vw,82px);gap:clamp(28px,5vw,64px)}
+.hero-photo{aspect-ratio:4/3;min-height:0;transform:none;border-radius:26px}
+.hero-image{height:100%;min-height:0;aspect-ratio:4/3;object-fit:contain;background:var(--surface-soft)}
+.hero-actions{gap:10px;margin-top:22px}
+.trust-row{gap:9px;margin-top:24px}
+.trust-row span{padding:5px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.62)}
+.cards.service-cards{grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+.service-card{display:flex;flex-direction:column;min-height:100%}
+.service-image{height:auto;aspect-ratio:4/3;object-fit:contain;background:var(--surface-soft)}
+.service-card .card-body{display:flex;flex:1;flex-direction:column}
+.service-card .icon-link{margin-top:auto;padding-top:10px}
+body.site-shell .home-process{background:var(--surface-soft)}
+.home-process{margin:8px auto 28px;padding-top:38px;padding-bottom:38px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface-soft)}
+.home-process .section-heading{align-items:center;margin-bottom:18px}
+.home-process h2{margin-bottom:6px}
+.home-process-intro{max-width:680px;margin:0;color:var(--muted)}
+.home-process-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.home-step{padding:22px;background:var(--surface);border:1px solid var(--line);border-radius:18px}
+.home-step .step-number{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid var(--line);border-radius:50%;font-weight:900}
+.home-step h3{margin:12px 0 5px;color:var(--brand);font-size:18px}
+.home-step p{margin:0 0 10px;color:var(--muted);font-size:14px}
+.home-step a{font-weight:800;color:var(--brand)}
+.home-step a:hover{color:var(--accent)}
+.split-band{gap:clamp(28px,5vw,64px)}
+.split-image{aspect-ratio:4/3;height:auto;object-fit:contain;background:var(--surface-soft)}
+@media(max-width:1150px){.cards.service-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:950px){.cards.service-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.home-process-grid{grid-template-columns:1fr}.home-process{margin-right:5%;margin-left:5%;padding-right:5%;padding-left:5%}}
+@media(max-width:760px){.hero{gap:30px}.hero-copy{max-width:none}.hero-photo{max-width:620px;width:100%;margin-inline:auto}.home-process .section-heading{align-items:flex-start;flex-direction:column}.split-image{max-height:340px}}
+@media(max-width:520px){.cards.service-cards{grid-template-columns:1fr}.hero h1{letter-spacing:-.8px}.trust-row{gap:7px}.trust-row span{font-size:11px;padding:4px 9px}}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+summary:focus-visible{border-radius:4px}
+@media(max-width:760px){header{align-items:flex-start}nav{max-width:100%;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;scrollbar-width:thin;padding-bottom:4px}}
